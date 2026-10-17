@@ -20,14 +20,10 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Subir Microsserviço de Entregas (Docker)
+      - name: Subir Microsserviço de Entregas (API)
         run: |
           git clone https://github.com/proflealvjo/ON_TDS_JAVA_ADVANCED_MICROSSERVICES_ENTREGAS.git
-          cd ON_TDS_JAVA_ADVANCED_MICROSSERVICES_ENTREGAS
-          # Ajusta a imagem base descontinuada no Docker Hub (openjdk:21-jdk -> eclipse-temurin:21-jdk)
-          sed -i 's|openjdk:21-jdk|eclipse-temurin:21-jdk|g' Dockerfile
-          docker build -t api-entregas-image .
-          docker run -d --name my-app-entregas -p 8080:8080 api-entregas-image
+          nohup java -jar ON_TDS_JAVA_ADVANCED_MICROSSERVICES_ENTREGAS/entregas-0.0.1-SNAPSHOT.jar > api.log 2>&1 &
           echo "Aguardando inicialização da API..."
           for i in {1..30}; do
             if curl -s http://localhost:8080/entregas > /dev/null 2>&1; then
@@ -37,8 +33,8 @@ jobs:
             sleep 2
           done
           if ! curl -s http://localhost:8080/entregas > /dev/null 2>&1; then
-            echo "Erro: A API não respondeu a tempo. Logs do container:"
-            docker logs my-app-entregas
+            echo "Erro: A API não respondeu a tempo. Logs da aplicação:"
+            cat api.log
             exit 1
           fi
 
