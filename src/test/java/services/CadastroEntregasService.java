@@ -36,9 +36,9 @@ public class CadastroEntregasService {
     //Variavel responsável por guardar as requisições http
     public Response response;
 
-    //Variavel responsável por armazenar a URL podendo ser local ou do servidor
-    //String baseUrl = "http://localhost:8080";
-    String baseUrl = "https://tds-on-api-entregas-accb20374610.herokuapp.com";
+    // Variável responsável por armazenar a URL podendo ser configurada via propriedade (-Dbase.url) ou variável de ambiente (BASE_URL)
+    public String baseUrl = System.getProperty("base.url",
+            System.getenv().getOrDefault("BASE_URL", "http://localhost:8080"));
 
     //Variavel responsável por representar o ID no método de deleção
     String idDelivery;
@@ -109,10 +109,10 @@ public class CadastroEntregasService {
     }
 
     public void setContract(String contract) throws IOException {
-        switch (contract) {
-            case "Cadastro bem-sucedido de entrega" -> jsonSchema = loadJsonFromFile(
-                    schemaPath + "cadastro-bem-sucedido-de-entrega.json");
-            default -> throw new IllegalStateException("Contrato inesperado"  + contract);
+        if ("Cadastro bem-sucedido de entrega".equals(contract)) {
+            jsonSchema = loadJsonFromFile(schemaPath + "cadastro-bem-sucedido-de-entrega.json");
+        } else {
+            throw new IllegalStateException("Contrato inesperado: " + contract);
         }
     }
 
@@ -126,8 +126,6 @@ public class CadastroEntregasService {
         //Converter JSON de resposta para JsonNode
         JsonNode jsonResponseNode = mapper.readTree(jsonResponse.toString());
         //Validar o JSON de resposta contra o esquema
-        Set<ValidationMessage> schemaValidationErrors = schema.validate(jsonResponseNode);
-
-        return schemaValidationErrors;
+        return schema.validate(jsonResponseNode);
     }
 }
