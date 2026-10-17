@@ -24,6 +24,8 @@ jobs:
         run: |
           git clone https://github.com/proflealvjo/ON_TDS_JAVA_ADVANCED_MICROSSERVICES_ENTREGAS.git
           cd ON_TDS_JAVA_ADVANCED_MICROSSERVICES_ENTREGAS
+          # Ajusta a imagem base descontinuada no Docker Hub (openjdk:21-jdk -> eclipse-temurin:21-jdk)
+          sed -i 's|openjdk:21-jdk|eclipse-temurin:21-jdk|g' Dockerfile
           docker build -t api-entregas-image .
           docker run -d --name my-app-entregas -p 8080:8080 api-entregas-image
           echo "Aguardando inicialização da API..."
@@ -34,6 +36,11 @@ jobs:
             fi
             sleep 2
           done
+          if ! curl -s http://localhost:8080/entregas > /dev/null 2>&1; then
+            echo "Erro: A API não respondeu a tempo. Logs do container:"
+            docker logs my-app-entregas
+            exit 1
+          fi
 
       - name: Build and test
         run: mvn clean test # Executa a suíte de testes Cucumber com RestAssured
