@@ -20,20 +20,31 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Diagnóstico - Verificar arquivos de feature
+        run: |
+          echo "=== Conteúdo do ExemploContexto.feature ==="
+          cat src/main/resources/features/ExemploContexto.feature
+          echo ""
+          echo "=== Conteúdo do CadastroEntregas.feature ==="
+          cat src/main/resources/features/CadastroEntregas.feature
+
       - name: Subir Microsserviço de Entregas (API)
         run: |
           git clone https://github.com/proflealvjo/ON_TDS_JAVA_ADVANCED_MICROSSERVICES_ENTREGAS.git
           nohup java -jar ON_TDS_JAVA_ADVANCED_MICROSSERVICES_ENTREGAS/entregas-0.0.1-SNAPSHOT.jar > api.log 2>&1 &
           echo "Aguardando inicialização da API..."
-          for i in {1..30}; do
-            if curl -s http://localhost:8080/entregas > /dev/null 2>&1; then
-              echo "API de entregas iniciada com sucesso!"
+          for i in {1..40}; do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/entregas 2>/dev/null || echo "000")
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "API de entregas iniciada com sucesso! (HTTP $HTTP_CODE)"
               break
             fi
-            sleep 2
+            echo "Tentativa $i/40 - HTTP: $HTTP_CODE. Aguardando..."
+            sleep 3
           done
-          if ! curl -s http://localhost:8080/entregas > /dev/null 2>&1; then
-            echo "Erro: A API não respondeu a tempo. Logs da aplicação:"
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/entregas 2>/dev/null || echo "000")
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "Erro: A API não respondeu a tempo. Último HTTP: $HTTP_CODE. Logs da aplicação:"
             cat api.log
             exit 1
           fi
