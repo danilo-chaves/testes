@@ -37,7 +37,8 @@ public class CadastroEntregasService {
     public Response response;
 
     //Variavel responsável por armazenar a URL podendo ser local ou do servidor
-    String baseUrl = "http://localhost:8080";
+    //String baseUrl = "http://localhost:8080";
+    String baseUrl = "https://tds-on-api-entregas-accb20374610.herokuapp.com";
 
     //Variavel responsável por representar o ID no método de deleção
     String idDelivery;
