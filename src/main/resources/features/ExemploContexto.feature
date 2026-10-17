@@ -19,4 +19,4 @@ Funcionalidade: Deletar uma entrega
   Cenário: Deve ser possível deletar uma entrega
     Dado que eu recupere o ID da entrega criada no contexto
     Quando eu enviar a requisição com o ID para o endpoint "/entregas" de deleção de entrega
-    Então o status code da resposta deve ser 400
+    Então o status code da resposta deve ser 204

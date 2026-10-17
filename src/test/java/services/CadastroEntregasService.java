@@ -86,7 +86,7 @@ public class CadastroEntregasService {
                                 .jsonPath()
                                 .prettify(),
                         EntregaModel.class)
-                .getNumeroPedido());
+                .getNumeroEntrega());
     }
 
     public void deleteDelivery(String endPoint) {
